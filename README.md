@@ -4,7 +4,7 @@ This is the source code and dataset to the paper "FuncGuard: Function-level Smar
 
 # Approach
 
-![绘图1](https://github.com/shawnwbts/SIRCOT-main/blob/master/SIRCOT.png)
+![绘图1](https://github.com/shawnwbts/FuncGuard/blob/master/fig1.png)
 
 ## 🎯 Project Scope
 
