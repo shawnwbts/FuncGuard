@@ -1,0 +1,7 @@
+fn_coding:
+  next:
+    - fn_secure_refine
+  agent_config: fn_coding.yaml
+
+fn_secure_refine:
+  agent_config: fn_secure_refine.yaml

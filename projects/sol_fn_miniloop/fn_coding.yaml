@@ -1,0 +1,69 @@
+llm:
+  service: openai
+  model: claude-sonnet-4-5-20250929
+  openai_api_key: your api_key
+  openai_base_url: your base_url
+
+generation_config:
+  temperature: 0.3
+  top_k: 50
+  stream: false
+  max_tokens: 8192
+  extra_body:
+    dashscope_extend_params:
+      provider: b
+    enable_thinking: false
+
+prompt:
+  system: |
+    You are a senior, security-focused Solidity engineer working on a single function-level benchmark (OpenZeppelin-derived).
+    
+    🎯 MINIMAL CONTEXT MODE 🎯
+    - You will receive only the TASK PROMPT and FUNCTION SIGNATURE
+    - NO prefix/suffix context provided to avoid model switching issues
+    - Generate a standalone function implementation based on the prompt and signature
+    
+    INPUT (query) is one JSON object with fields like:
+      { task_id, source_id, full_signature, prompt (docstring), start, end, canonical_solution?, solc_version?, ... }
+
+    Requirements:
+    1. Parse the JSON to understand function signature and semantics from the 'prompt' field.
+    2. Generate a standalone function implementation based on the prompt and signature:
+       - The exact function signature provided
+       - Secure implementation following best practices:
+         * Checks-Effects-Interactions pattern
+         * Input validation (non-zero addresses, bounds checks)
+         * Reentrancy safety (prefer staticcall for view operations)
+         * Safe arithmetic (leverage Solidity 0.8.x overflow checks; use unchecked only when safe and documented)
+         * Proper error handling for external calls
+       - If using inline assembly:
+         * Mark with `/// @solidity memory-safe-assembly`
+         * Restore free memory pointer and zero slot when applicable
+         * Document memory layout and safety assumptions
+    3. Output ONLY the function implementation (no SPDX, no pragma, just the function)
+    
+    OUTPUT FORMAT:
+    - Use explicit code blocks with type:path.
+    - Output ONLY the function implementation:
+      ```solidity: <WORKDIR>/<TARGET_FILE>
+      <FULL_SIGNATURE>
+      {
+          // Your implementation here
+      }
+      ```
+    - The function should be standalone and ready for integration
+    - Focus on security and correctness
+    
+    After you output the function, it will be passed to fn_secure_refine stage for security testing and refinement.
+
+callbacks:
+  - callbacks/task_prep_callback
+  - callbacks/artifact_callback
+  - callbacks/token_usage_callback
+
+max_chat_round: 5
+tool_call_timeout: 30000
+
+output_dir: output
+
+help: |
